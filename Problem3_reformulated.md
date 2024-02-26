@@ -105,3 +105,34 @@ for steps in [2, 4]:
 
 # Comparison with true analytical formula needs to be conducted based on specific model details
 ```
+# Question 3 example code
+
+```python
+import pandas as pd
+import statsmodels.api as sm
+
+# Load the dataset
+df = pd.read_csv('data/shiller_data_clean.csv')
+
+# Selecting the necessary columns for the predictive regression
+# Assuming we're predicting 'Real price' based on the model suggested in Problem III
+# Adjust the 'X' variable as per the specific requirements of the question
+X = df[['Real Dividend', 'Long_interest_rate']]  # Example predictors
+y = df['Real price']
+
+# Adding a constant for the intercept
+X = sm.add_constant(X)
+
+# Splitting the data into training and testing sets if necessary
+# Here, we use the entire dataset for simplicity
+# For a time series analysis, consider chronological splits
+
+# Perform the OLS regression
+model = sm.OLS(y, X).fit()
+
+# Print out the summary of the regression
+print(model.summary())
+
+# Interpretation of the results
+# This should include an analysis of the coefficients, R-squared, and any statistical tests or diagnostics relevant to the model's assumptions.
+```
