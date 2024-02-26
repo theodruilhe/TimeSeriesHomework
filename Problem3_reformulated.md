@@ -58,3 +58,50 @@ beta_hat = ols_estimator(x, y)
 
 print(f"Estimated beta: {beta_hat}")
 ```
+
+# Question 2 example code
+
+```python
+import numpy as np
+import statsmodels.api as sm
+from statsmodels.regression.linear_model import OLS
+from statsmodels.sandbox.regression.gmm import NeweyWest
+
+# Function to simulate the model
+def simulate_model(n, beta, rho, sigma_u, sigma_v, sigma_uv, steps=1):
+    np.random.seed(0)  # For reproducibility
+    x = np.zeros(n)
+    y = np.zeros(n)
+    u = np.random.normal(0, sigma_u, n)
+    v = np.random.normal(0, sigma_v, n)
+    cov_uv = sigma_uv * sigma_u * sigma_v
+    u += cov_uv / sigma_u * v  # Add covariance
+
+    for t in range(1, n):
+        x[t] = rho * x[t-1] + v[t]
+        if t >= steps:
+            y[t] = beta * x[t-steps] + u[t]
+
+    return y, x
+
+# Function to compute OLS and its standard deviation
+def compute_ols_std(y, x, lags=1):
+    model = OLS(y, sm.add_constant(x)).fit(cov_type='HAC', cov_kwds={'maxlags': lags})
+    return model.params[1], model.bse[1]
+
+# Parameters (example values, adjust based on the problem)
+n = 100  # Sample size
+beta = 0.5
+rho = 0.9
+sigma_u = 1
+sigma_v = 1
+sigma_uv = 0.5
+
+# Simulate and compute OLS for two-step and four-step ahead forecasts
+for steps in [2, 4]:
+    y, x = simulate_model(n, beta, rho, sigma_u, sigma_v, sigma_uv, steps=steps)
+    beta_est, std_est = compute_ols_std(y[steps:], x[steps:], lags=steps)
+    print(f"Steps ahead: {steps}, OLS estimate of beta: {beta_est:.4f}, Standard deviation: {std_est:.4f}")
+
+# Comparison with true analytical formula needs to be conducted based on specific model details
+```
